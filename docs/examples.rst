@@ -5,10 +5,10 @@ Example usage
 
 .. testcode:: keplercalc
 
-   from keplercalc import Keplercalc
+   from keplercalc import hello
 
    name = "Spencer"
-   output = Keplercalc.hello(name)
+   output = hello(name)
    print(output)
 
 Output:
