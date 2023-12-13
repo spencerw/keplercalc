@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "keplercalc"
+description = "Tools for working with Keplerian orbits"
+readme = "README.md"
+license = { text = "MIT" }
+version = "0.1.0"
+requires-python = ">=3.8"
+authors = [
+  {name = "Spencer Wallace", email = "spencerw530@gmail.com"}
+]
+keywords = ["orbits", "n-body"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Communications",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+"Homepage" = "https://github.com/spencerw/keplercalc"
+
+[tool.ruff]
+ignore = ["E501"]
+[tool.ruff.extend-per-file-ignores]
+"__init__.py" = ["F401"]
