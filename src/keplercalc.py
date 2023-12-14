@@ -4,6 +4,48 @@ from mathhelpers import cross, dot, nr, PQW
 def hello(name):
     return 'Hello ' + name + '!'
 
+def orb_params(snap, isHelio=False, mCentral=1.0):
+    """
+    Takes a Pynbody snapshot of particles and calculates gives them fields
+    corresponding to Kepler orbital elements. Assumes that the central star
+    is particle #0 and that the positions and velocities are in barycentric
+    coordinates.
+
+    Parameters
+    ----------
+    snap: SimArray
+        A snapshot of the particles
+    isHelio: boolean
+        Skip frame transformation if the snap is already in heliocentric coordinates
+    mCentral: float
+        Mass of central star in simulation units. Need to provide if no star particle in snap
+
+    Returns
+    -------
+    SimArray
+        A copy of 'snap' with additional fields 'a', 'ecc', 'inc', 'asc_node',
+        'omega' and 'M' added.
+    """
+
+    x = np.array(snap.d['pos'])
+    x_h = x[1:] - x[0]
+    v = np.array(snap.d['vel'])
+    v_h = v[1:] - v[0]
+    m1 = np.array(snap['mass'][0])
+    pl = snap[1:]
+    m2 = np.array(pl['mass'])
+
+    if isHelio:
+        x_h = x
+        v_h = v
+        pl = snap
+        m1 = mCentral
+
+    pl['a'], pl['e'], pl['inc'], pl['asc_node'], pl['omega'], pl['M'] \
+        = cart2kep(x_h[:,0], x_h[:,1], x_h[:,2], v_h[:,0], v_h[:,1], v_h[:,2], m1, m2)
+    
+    return pl
+
 def cart2kep(X, Y, Z, vx, vy, vz, m1, m2):
     """
     Convert an array of cartesian positions and velocities

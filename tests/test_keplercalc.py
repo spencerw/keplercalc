@@ -1,6 +1,8 @@
 from unittest import TestCase
 import numpy as np
-from keplercalc import hello, kep2cart, cart2kep
+import pynbody as pb
+import os
+from keplercalc import hello, kep2cart, cart2kep, orb_params
 
 class TestKeplercalc(TestCase):
     def test_hello1(self):
@@ -47,3 +49,17 @@ class TestKeplercalc(TestCase):
         self.assertTrue(np.fabs(vx1 - vx) < tol)
         self.assertTrue(np.fabs(vy1 - vy) < tol)
         self.assertTrue(np.fabs(vz1 - vz) < tol)
+
+    def test_snap(self):
+        tol = 1e-8
+
+        path = os.path.dirname(os.path.abspath(__file__))
+        snap = pb.load(path + '/test.ic')
+        pl = orb_params(snap)
+
+        self.assertTrue(np.mean(pl['a']) - 2.96233536 < tol)
+        self.assertTrue(np.mean(pl['e']) - 0.06809352 < tol)
+        self.assertTrue(np.mean(pl['inc']) - 0.005003 < tol)
+        self.assertTrue(np.mean(pl['asc_node']) - 3.15458748 < tol)
+        self.assertTrue(np.mean(pl['omega']) - 3.13253456)
+        self.assertTrue(np.mean(pl['M']) - 3.13972053 < tol)
