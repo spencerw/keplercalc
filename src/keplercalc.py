@@ -1,10 +1,12 @@
 import numpy as np
+import pynbody as pb
+import pandas as pd
 from mathhelpers import cross, dot, nr, PQW
 
 def hello(name):
     return 'Hello ' + name + '!'
 
-def orb_params(snap, isHelio=False, mCentral=1.0):
+def orb_params(filepath, isHelio=False, mCentral=1.0, fmt='tipsy'):
     """
     Takes a Pynbody snapshot of particles and calculates gives them fields
     corresponding to Kepler orbital elements. Assumes that the central star
@@ -13,12 +15,14 @@ def orb_params(snap, isHelio=False, mCentral=1.0):
 
     Parameters
     ----------
-    snap: SimArray
-        A snapshot of the particles
+    filepath: string
+        The path to the simulation snapshot file
     isHelio: boolean
         Skip frame transformation if the snap is already in heliocentric coordinates
     mCentral: float
         Mass of central star in simulation units. Need to provide if no star particle in snap
+    fmt: string
+        The format of the simulation snapshot. Supports TIPSY or genga outputs
 
     Returns
     -------
@@ -27,9 +31,29 @@ def orb_params(snap, isHelio=False, mCentral=1.0):
         'omega' and 'M' added.
     """
 
-    x = np.array(snap.d['pos'])
+    if fmt == 'tipsy':
+        snap = pb.load(filepath)
+    elif fmt == 'genga':
+        nam = ['t', 'i1', 'm1', 'r1', 'x1', 'y1', 'z1', 'vx1', 'vy1', 'vz1', \
+        'Sx1', 'Sy1', 'Sz1', 'amin1', 'amax1', 'emin1', 'emax1', 'aecount1', \
+        'aecountT1', 'enccountT1', 'test1']
+        df = pd.read_csv(filepath, names=nam, sep=' ', index_col=False)
+        snap = pb.new(len(df))
+        snap['pos'][:,0] = df['x1']
+        snap['pos'][:,1] = df['y1']
+        snap['pos'][:,2] = df['z1']
+        snap['vel'][:,0] = df['vx1']
+        snap['vel'][:,1] = df['vy1']
+        snap['vel'][:,2] = df['vz1']
+        snap['mass'] = df['m1']
+        snap['rad'] = df['r1']
+        snap['iord'] = df['i1']
+    else:
+        raise ValueError(fmt + ' is not a valid format type')
+
+    x = np.array(snap['pos'])
     x_h = x[1:] - x[0]
-    v = np.array(snap.d['vel'])
+    v = np.array(snap['vel'])
     v_h = v[1:] - v[0]
     m1 = np.array(snap['mass'][0])
     pl = snap[1:]
